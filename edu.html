@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>edu.com</title>
+<style>
+:root {
+    --bg: #ffffff;
+    --text: #000000;
+    --card: #f2f2f2;
+}
+
+body.dark {
+    --bg: #121212;
+    --text: #ffffff;
+    --card: #1f1f1f;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: var(--card);
+}
+
+header h1 {
+    font-size: 24px;
+}
+
+header button {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.hero {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.search {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px;
+}
+
+.search input {
+    padding: 10px;
+    width: 250px;
+}
+
+.search button {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+#results {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.card {
+    background: var(--card);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.card a {
+    color: #4da6ff;
+    text-decoration: none;
+}
+
+footer {
+    text-align: center;
+    padding: 15px;
+    background: var(--card);
+    margin-top: 40px;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>edu.com</h1>
+<button id="themeToggle">🌙</button>
+</header>
+
+<main>
+<section class="hero">
+<h2>Learn Anything</h2>
+<p>Search science, technology, history and more</p>
+</section>
+
+<section class="search">
+<input type="text" id="searchInput" placeholder="Search a topic...">
+<button onclick="searchWiki()">Search</button>
+</section>
+
+<section id="results"></section>
+</main>
+
+<footer>
+<p>© 2026 edu.com | Built by Jovpro</p>
+</footer>
+
+<script>
+    // Dark & Light mode
+const toggleBtn = document.getElementById("themeToggle");
+
+toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    toggleBtn.textContent = 
+        document.body.classList.contains("dark") ? "☀️" : "🌙";
+});
+
+// Wikipedia Search
+function searchWiki() {
+    const query = document.getElementById("searchInput").value;
+    const resultsDiv = document.getElementById("results");
+
+    if (query === "") {
+        resultsDiv.innerHTML = "<p>Please type something.</p>";
+        return;
+    }
+
+    resultsDiv.innerHTML = "<p>Loading...</p>";
+
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${query}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.type === "disambiguation" || data.extract === undefined) {
+                resultsDiv.innerHTML = "<p>No clear result found.</p>";
+                return;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="card">
+                    <h3>${data.title}</h3>
+                    <p>${data.extract}</p>
+                    <a href="${data.content_urls.desktop.page}" target="_blank">
+                        Read more on Wikipedia
+                    </a>
+                </div>
+            `;
+        })
+        .catch(() => {
+            resultsDiv.innerHTML = "<p>Error fetching data.</p>";
+        });
+}
+</script>
+</body>
+</html>
